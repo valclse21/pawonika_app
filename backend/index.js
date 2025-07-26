@@ -9,22 +9,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// KONEKSI DATABASE (Membaca dari Environment Variables)
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  port: process.env.DB_PORT || 4000,
-  ssl: {
-    rejectUnauthorized: true, // Wajib untuk database online seperti TiDB Cloud
-  },
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+const pool = require('./db'); // Mengimpor pool dari db.js
 
-console.log("Pool database siap digunakan.");
+// Cek koneksi database
+pool.getConnection()
+    .then(connection => {
+        console.log('🚀 Server backend terkoneksi ke database.');
+        connection.release();
+    })
+    .catch(err => {
+        console.error('❌ Gagal terkoneksi ke database:', err);
+        process.exit(1); // Keluar dari aplikasi jika koneksi gagal
+    });
 
 // =================================================================
 // API ENDPOINTS
