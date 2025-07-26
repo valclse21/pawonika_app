@@ -1,22 +1,30 @@
-// backend/index.js (Versi Utuh, Final, dan Lengkap)
+// backend/index.js (Versi Final untuk Deployment)
 
 const express = require("express");
 const cors = require("cors");
-const mysql = require("mysql2/promise"); // Menggunakan /promise
+const mysql = require("mysql2/promise");
+require("dotenv").config(); // <-- PENTING: Untuk membaca environment variables
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// KONEKSI DATABASE (VERSI BENAR)
+// KONEKSI DATABASE (Membaca dari Environment Variables)
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "pawon_ika_db",
-}); // .promise() dihapus dari sini karena sudah ada di require
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT || 4000,
+  ssl: {
+    rejectUnauthorized: true, // Wajib untuk database online seperti TiDB Cloud
+  },
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
 
-console.log("Pool database berhasil dibuat.");
+console.log("Pool database siap digunakan.");
 
 // =================================================================
 // API ENDPOINTS
@@ -217,7 +225,7 @@ app.delete("/api/resep/:id", async (req, res) => {
 });
 
 // --- Server Start ---
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server backend berjalan di http://localhost:${PORT}`);
+  console.log(`🚀 Server backend berjalan di port ${PORT}`);
 });
