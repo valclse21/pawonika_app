@@ -44,10 +44,15 @@ app.get("/api/bahan", async (req, res) => {
 // POST BAHAN BARU
 app.post("/api/bahan", async (req, res) => {
   try {
-    const { nama, satuan, harga_per_satuan } = req.body;
+    const { nama, satuan, harga_per_satuan, jumlah_stok } = req.body;
     const query =
-      "INSERT INTO bahan_baku (nama, satuan, harga_per_satuan) VALUES (?, ?, ?)";
-    const [result] = await pool.query(query, [nama, satuan, harga_per_satuan]);
+      "INSERT INTO bahan_baku (nama, satuan, harga_per_satuan, jumlah_stok) VALUES (?, ?, ?, ?)";
+    const [result] = await pool.query(query, [
+      nama,
+      satuan,
+      harga_per_satuan,
+      jumlah_stok || 0,
+    ]);
     res.status(201).json({ id: result.insertId, ...req.body });
   } catch (error) {
     console.error("Error di POST /api/bahan:", error);
@@ -59,10 +64,10 @@ app.post("/api/bahan", async (req, res) => {
 app.put("/api/bahan/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const { nama, satuan, harga_per_satuan } = req.body;
+    const { nama, satuan, harga_per_satuan, jumlah_stok } = req.body;
     const query =
-      "UPDATE bahan_baku SET nama = ?, satuan = ?, harga_per_satuan = ? WHERE bahan_id = ?";
-    await pool.query(query, [nama, satuan, harga_per_satuan, id]);
+      "UPDATE bahan_baku SET nama = ?, satuan = ?, harga_per_satuan = ?, jumlah_stok = ? WHERE bahan_id = ?";
+    await pool.query(query, [nama, satuan, harga_per_satuan, jumlah_stok, id]);
     res
       .status(200)
       .json({ message: `Bahan baku ID ${id} berhasil diperbarui` });
@@ -80,6 +85,26 @@ app.delete("/api/bahan/:id", async (req, res) => {
     res.status(200).json({ message: `Bahan baku ID ${id} berhasil dihapus` });
   } catch (error) {
     console.error(`Error di DELETE /api/bahan/${id}:`, error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// POST (UPDATE) STOK BAHAN BAKU
+app.post("/api/bahan/:id/update-stok", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { jumlah_perubahan } = req.body; // Bisa positif (menambah) atau negatif (mengurangi)
+    if (typeof jumlah_perubahan !== 'number') {
+        return res.status(400).json({ message: 'Jumlah perubahan harus berupa angka.' });
+    }
+    const query =
+      "UPDATE bahan_baku SET jumlah_stok = jumlah_stok + ? WHERE bahan_id = ?";
+    await pool.query(query, [jumlah_perubahan, id]);
+    res
+      .status(200)
+      .json({ message: `Stok bahan baku ID ${id} berhasil diperbarui` });
+  } catch (error) {
+    console.error(`Error di POST /api/bahan/${id}/update-stok:`, error);
     res.status(500).json({ message: "Server Error" });
   }
 });
