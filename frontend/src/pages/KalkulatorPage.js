@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://pawon-ika-api.onrender.com";
 
 // Fungsi bantuan untuk membulatkan ke kelipatan terdekat (misal: 500 atau 1000)
 const bulatkanHarga = (harga, kelipatan = 500) => {

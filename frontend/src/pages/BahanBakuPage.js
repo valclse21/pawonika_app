@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast"; // <-- Import untuk notifikasi
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://pawon-ika-api.onrender.com";
 
 function BahanBakuPage() {
   const [bahanList, setBahanList] = useState([]);

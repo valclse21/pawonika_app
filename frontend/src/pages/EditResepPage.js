@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://pawon-ika-api.onrender.com";
 
 function EditResepPage() {
   const { id } = useParams();
